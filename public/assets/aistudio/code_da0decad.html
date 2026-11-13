@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-variant": "#dce2f7", "on-tertiary-fixed": "#001f27", "inverse-surface": "#293040", "primary": "#0053d3", "on-primary-fixed-variant": "#003fa4", "on-error-container": "#93000a", "surface-container-highest": "#dce2f7", "tertiary-fixed": "#b3ebff", "primary-fixed": "#dae1ff", "on-tertiary": "#ffffff", "surface-container": "#e9edff", "on-primary": "#ffffff", "surface-container-high": "#e1e8fd", "surface-dim": "#d3daef", "tertiary": "#00667c", "secondary-fixed": "#ffdbd0", "outline-variant": "#c2c6d8", "on-tertiary-container": "#ffffff", "on-tertiary-fixed-variant": "#004e5f", "inverse-on-surface": "#edf0ff", "tertiary-container": "#00819b", "error-container": "#ffdad6", "on-primary-container": "#fffeff", "on-surface-variant": "#424655", "surface-container-low": "#f1f3ff", "inverse-primary": "#b3c5ff", "tertiary-fixed-dim": "#4cd6fb", "on-primary-fixed": "#001849", "background": "#f9f9ff", "primary-container": "#1a6bff", "secondary-container": "#fe6a34", "on-secondary": "#ffffff", "on-secondary-fixed": "#390c00", "primary-fixed-dim": "#b3c5ff", "secondary": "#ab3500", "on-error": "#ffffff", "secondary-fixed-dim": "#ffb59d", "on-secondary-fixed-variant": "#832600", "outline": "#727687", "surface-container-lowest": "#ffffff", "surface-tint": "#0055d5", "error": "#ba1a1a", "on-background": "#141b2b", "surface": "#f9f9ff", "surface-bright": "#f9f9ff", "on-secondary-container": "#5d1900", "on-surface": "#141b2b" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2.5rem", "margin": "2rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "gutter": "1.5rem", "space-lg": "1.5rem", "gutter-mobile": "0.75rem", "space-xs": "0.25rem", "space-md": "1rem" }, "fontFamily": { "headline-xl-mobile": [ "Plus Jakarta Sans" ], "headline-lg": [ "Plus Jakarta Sans" ], "headline-xl": [ "Plus Jakarta Sans" ], "body-sm": [ "Plus Jakarta Sans" ], "body-md": [ "Plus Jakarta Sans" ], "display-hero-mobile": [ "Plus Jakarta Sans" ], "body-lg": [ "Plus Jakarta Sans" ], "label-md": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "label-lg": [ "Plus Jakarta Sans" ], "display-hero": [ "Plus Jakarta Sans" ], "label-sm": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ] }, "fontSize": { "headline-xl-mobile": [ "26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "headline-lg": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-xl": [ "36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "20px", "fontWeight": "400" } ], "body-md": [ "15px", { "lineHeight": "24px", "fontWeight": "400" } ], "display-hero-mobile": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "headline-md": [ "22px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-lg": [ "14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" } ], "display-hero": [ "48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "800" } ], "label-sm": [ "10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" } ], "headline-sm": [ "18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" } ] } } } }</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 w-full z-50 bg-[#0B132B] shadow-[0_2px_12px_rgba(0,0,0,0.18)]"><div class="h-16 max-w-7xl mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group" data-path="flight-review" href="#"><div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-secondary to-secondary-container flex items-center justify-center shadow-[0_2px_8px_rgba(254,106,52,0.35)] relative overflow-hidden"><span class="material-symbols-outlined text-on-secondary text-[22px]">flight_takeoff</span></div><div class="flex items-baseline"><span class="font-headline-sm text-headline-sm font-bold text-surface tracking-tight">Travel</span><span class="font-headline-sm text-headline-sm font-extrabold text-[#FF8A00] tracking-tight">Kart</span></div></a></div><nav class="hidden md:flex items-center gap-space-xs" data-active-classes="bg-surface/10 text-surface font-semibold rounded-full"><a class="px-space-md py-space-xs rounded-full font-label-lg text-label-lg text-surface-variant/80 hover:text-surface hover:bg-surface/5 transition-all" data-path="list-property" href="#">List Your Property</a><a class="px-space-md py-space-xs rounded-full font-label-lg text-label-lg text-surface-variant/80 hover:text-surface hover:bg-surface/5 transition-all" data-path="my-trips" href="#">My Trips</a><a class="px-space-md py-space-xs rounded-full font-label-lg text-label-lg text-surface-variant/80 hover:text-surface hover:bg-surface/5 transition-all" data-path="wishlist" href="#">Wishlist</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface/5 text-surface-variant text-label-md font-label-md cursor-pointer hover:bg-surface/10 hover:text-surface transition-all"><span class="material-symbols-outlined text-[16px]">language</span><span>INR | English</span></div><div class="flex items-center gap-space-sm pl-space-xs"><a class="hidden lg:inline-block font-label-lg text-label-lg text-surface-variant hover:text-surface transition-colors" data-path="user-profile" href="#">Login or Create Account</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer shadow-[0_2px_6px_rgba(0,83,211,0.3)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full flex-1 pt-16 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full bg-surface-container-low py-space-lg">
+<div class="max-w-7xl mx-auto px-margin">
+<!-- Progress Stepper -->
+<section class="w-full bg-surface-container-lowest rounded-full p-space-sm shadow-sm mb-space-lg">
+<div class="flex items-center justify-between px-space-md py-space-xs">
+<!-- Step 1: Completed -->
+<div class="flex items-center gap-space-sm text-primary">
+<div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="font-label-lg text-label-lg font-semibold tracking-tight">1. Flight Review</span>
+</div>
+<div class="flex-1 h-0.5 mx-space-md bg-primary"></div>
+<!-- Step 2: Active / Current -->
+<div class="flex items-center gap-space-sm text-primary">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shadow-sm">
+              2
+            </div>
+<span class="font-label-lg text-label-lg font-bold tracking-tight text-on-surface">2. Traveller Details</span>
+</div>
+<div class="flex-1 h-0.5 mx-space-md bg-outline-variant/40"></div>
+<!-- Step 3: Pending -->
+<div class="flex items-center gap-space-sm text-outline">
+<div class="w-7 h-7 rounded-full bg-surface-container text-outline flex items-center justify-center font-label-md text-label-md">
+              3
+            </div>
+<span class="font-label-lg text-label-lg font-medium">3. Add-ons &amp; Seats</span>
+</div>
+<div class="flex-1 h-0.5 mx-space-md bg-outline-variant/40"></div>
+<!-- Step 4: Pending -->
+<div class="flex items-center gap-space-sm text-outline">
+<div class="w-7 h-7 rounded-full bg-surface-container text-outline flex items-center justify-center font-label-md text-label-md">
+              4
+            </div>
+<span class="font-label-lg text-label-lg font-medium">4. Payment</span>
+</div>
+<div class="flex-1 h-0.5 mx-space-md bg-outline-variant/40"></div>
+<!-- Step 5: Pending -->
+<div class="flex items-center gap-space-sm text-outline">
+<div class="w-7 h-7 rounded-full bg-surface-container text-outline flex items-center justify-center font-label-md text-label-md">
+              5
+            </div>
+<span class="font-label-lg text-label-lg font-medium">5. Confirmation</span>
+</div>
+</div>
+</section>
+<!-- Two-Column Workspace -->
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- LEFT COLUMN (Booking Details & Forms ~68%) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-space-lg">
+<!-- Flight Summary Card -->
+<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<!-- Header Meta -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="px-space-sm py-space-xs rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase tracking-wider">Flight Summary</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Delhi (DEL) → Bengaluru (BLR)</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant">
+<span>Sat, 31 Oct '26</span>
+<span>•</span>
+<span>1 Adult • Economy</span>
+</div>
+</div>
+<!-- Airline Meta Row -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-wrap items-center justify-between gap-space-sm my-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm">
+<span class="font-label-lg text-label-lg font-extrabold text-primary tracking-tighter">6E</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">IndiGo</span>
+<span class="font-label-md text-label-md text-on-surface-variant">• 6E 2134</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Airbus A321neo</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Refundable Fare</span>
+</div>
+</div>
+<!-- Timings & Trajectory Bar -->
+<div class="py-space-md grid grid-cols-12 items-center gap-space-sm">
+<!-- Origin -->
+<div class="col-span-4 flex flex-col">
+<span class="font-headline-lg text-headline-lg font-extrabold text-on-surface leading-none">06:15</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-primary mt-space-xs">Delhi (DEL)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Terminal 3</span>
+<span class="font-label-sm text-label-sm text-outline truncate">Indira Gandhi Intl Airport</span>
+</div>
+<!-- Route Graphics -->
+<div class="col-span-4 flex flex-col items-center justify-center px-space-xs">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">2h 45m</span>
+<div class="w-full flex items-center my-space-xs relative">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="flex-1 h-0.5 bg-primary-fixed-dim relative flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[18px] bg-surface-container-lowest px-1 transform rotate-90">flight</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<span class="px-space-sm py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">Non Stop</span>
+</div>
+<!-- Destination -->
+<div class="col-span-4 flex flex-col items-end text-right">
+<span class="font-headline-lg text-headline-lg font-extrabold text-on-surface leading-none">09:00</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-primary mt-space-xs">Bengaluru (BLR)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Terminal 1</span>
+<span class="font-label-sm text-label-sm text-outline truncate">Kempegowda Intl Airport</span>
+</div>
+</div>
+<!-- Baggage & Check-in Strip -->
+<div class="mt-space-md pt-space-md flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low/60 rounded-lg p-space-md">
+<div class="flex items-center gap-space-lg text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">luggage</span>
+<span>Cabin: <strong class="text-on-surface">7 kg</strong> / person</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">work</span>
+<span>Check-in: <strong class="text-on-surface">15 kg</strong> / person</span>
+</div>
+<div class="hidden sm:flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">how_to_reg</span>
+<span class="text-on-surface">Free Web Check-in available</span>
+</div>
+</div>
+</div>
+<!-- Cancellation Policy Pill Notice -->
+<div class="mt-space-sm flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm px-space-xs">
+<span class="material-symbols-outlined text-[18px] text-secondary">info</span>
+<span>Cancellation fee starts at <strong class="text-on-surface font-medium">£1,500</strong> up to 2 hrs before departure.</span>
+</div>
+</article>
+<!-- Traveller Details Form Card -->
+<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Traveller Details (Adult 1)</h2>
+<p class="font-body-sm text-body-sm text-outline">Please ensure names match government ID (Aadhaar / Passport / Voter ID).</p>
+</div>
+</div>
+<span class="px-space-sm py-space-xs rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">Primary Contact</span>
+</div>
+<form class="space-y-space-md mt-space-sm" onsubmit="event.preventDefault();">
+<!-- Gender Selection -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs uppercase tracking-wide">Gender</label>
+<div class="flex items-center gap-space-sm">
+<label class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-primary text-on-primary font-label-lg text-label-lg cursor-pointer">
+<input checked="" class="accent-primary text-primary hidden" name="gender" type="radio" value="male"/>
+<span class="w-3.5 h-3.5 rounded-full bg-on-primary flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+</span>
+<span>Male</span>
+</label>
+<label class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container text-on-surface font-label-lg text-label-lg cursor-pointer hover:bg-surface-variant transition-colors">
+<input class="hidden" name="gender" type="radio" value="female"/>
+<span class="w-3.5 h-3.5 rounded-full bg-surface-lowest"></span>
+<span>Female</span>
+</label>
+<label class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container text-on-surface font-label-lg text-label-lg cursor-pointer hover:bg-surface-variant transition-colors">
+<input class="hidden" name="gender" type="radio" value="transgender"/>
+<span class="w-3.5 h-3.5 rounded-full bg-surface-lowest"></span>
+<span>Transgender</span>
+</label>
+</div>
+</div>
+<!-- Names Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs" for="first-name">First &amp; Middle Name</label>
+<input class="w-full px-space-md py-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="first-name" placeholder="e.g. Rahul" type="text" value="Rahul"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs" for="last-name">Last Name</label>
+<input class="w-full px-space-md py-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="last-name" placeholder="e.g. Sharma" type="text" value="Sharma"/>
+</div>
+</div>
+<!-- Contact Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs" for="email">Email Address</label>
+<input class="w-full px-space-md py-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="email" placeholder="rahul.sharma@example.com" type="email" value="rahul.sharma@example.com"/>
+<span class="font-body-sm text-body-sm text-outline mt-1 block">Your e-ticket &amp; invoice will be sent here</span>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs" for="mobile">Mobile Number</label>
+<div class="flex items-center">
+<span class="px-space-md py-space-sm bg-surface-container text-on-surface font-body-md text-body-md rounded-l-lg select-none">+91</span>
+<input class="w-full px-space-md py-space-sm rounded-r-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary transition-all" id="mobile" placeholder="98765 43210" type="tel" value="98765 43210"/>
+</div>
+<span class="font-body-sm text-body-sm text-outline mt-1 block">For boarding gate alerts via WhatsApp &amp; SMS</span>
+</div>
+</div>
+<!-- Save details checkbox -->
+<div class="pt-space-sm">
+<label class="flex items-center gap-space-sm cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Save this traveller for faster 1-click bookings next time</span>
+</label>
+</div>
+</form>
+</article>
+<!-- Add-ons & Travel Protection Card -->
+<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center gap-space-sm pb-space-md">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">card_giftcard</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Add-ons &amp; Travel Protection</h2>
+<p class="font-body-sm text-body-sm text-outline">Optional upgrades tailored for seamless travel.</p>
+</div>
+</div>
+<div class="space-y-space-md">
+<!-- Item 1: Seat Selection -->
+<label class="flex items-start justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-start gap-space-md">
+<input class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[22px]">airline_seat_recline_extra</span>
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface">Seat Selection</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Choose preferred extra-legroom, window or aisle seats.</p>
+</div>
+</div>
+<div class="text-right pl-space-sm">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Starts at ₹250</span>
+<span class="block font-label-sm text-label-sm text-outline">per seat</span>
+</div>
+</label>
+<!-- Item 2: Meal -->
+<label class="flex items-start justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-start gap-space-md">
+<input class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[22px]">restaurant</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface">In-flight Meal</h3>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-container/20 text-secondary font-label-sm text-label-sm font-semibold">20% Off</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pre-book freshly curated hot snacks, sandwiches &amp; drinks.</p>
+</div>
+</div>
+<div class="text-right pl-space-sm">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">From ₹350</span>
+<span class="block font-label-sm text-label-sm text-outline">per meal</span>
+</div>
+</label>
+<!-- Item 3: Insurance -->
+<label class="flex items-start justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-start gap-space-md">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" id="addon-insurance" type="checkbox"/>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-tertiary-container group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[22px]">health_and_safety</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface">Comprehensive Travel Insurance</h3>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">Recommended</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Coverage for baggage delay up to ₹10,000, trip cancellation &amp; medical expenses.</p>
+</div>
+</div>
+<div class="text-right pl-space-sm">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">₹199</span>
+<span class="block font-label-sm text-label-sm text-outline">/ traveller</span>
+</div>
+</label>
+</div>
+</article>
+<!-- Payment Method Card -->
+<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Select Payment Method</h2>
+<p class="font-body-sm text-body-sm text-outline">Choose your preferred gateway</p>
+</div>
+</div>
+</div>
+<!-- Payment Options Tabs/Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md mt-space-sm">
+<!-- UPI Option -->
+<label class="p-space-md rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">Zero Fee</span>
+<input checked="" class="accent-primary" name="pay-method" type="radio" value="upi"/>
+</div>
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">qr_code_scanner</span>
+                    UPI
+                  </h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">Google Pay, PhonePe, Paytm, BHIM</p>
+</div>
+</label>
+<!-- Cards Option -->
+<label class="p-space-md rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-medium">Fast Checkout</span>
+<input class="accent-primary" name="pay-method" type="radio" value="card"/>
+</div>
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">credit_card</span>
+                    Credit / Debit Card
+                  </h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">Visa, Mastercard, RuPay, Amex</p>
+</div>
+</label>
+<!-- Net Banking Option -->
+<label class="p-space-md rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-medium">All Banks</span>
+<input class="accent-primary" name="pay-method" type="radio" value="netbanking"/>
+</div>
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance</span>
+                    Net Banking
+                  </h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">HDFC, ICICI, SBI, Axis &amp; 40+ banks</p>
+</div>
+</label>
+</div>
+<!-- Security Badges Footer -->
+<div class="mt-space-lg p-space-sm rounded-lg bg-surface-container-low flex flex-wrap items-center justify-center gap-space-md text-outline font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span>256-bit SSL Encrypted</span>
+</div>
+<span>•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span>RBI Compliant</span>
+</div>
+<span>•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">security</span>
+<span>PCI-DSS Certified</span>
+</div>
+</div>
+</article>
+</div>
+<!-- RIGHT COLUMN (Sticky Fare Summary Card ~32%) -->
+<aside class="col-span-12 lg:col-span-4 sticky top-6">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+<!-- Card Header -->
+<div class="flex items-center justify-between pb-space-md">
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Fare Summary</h2>
+<span class="font-body-sm text-body-sm text-outline">1 Adult • Economy</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+</div>
+</div>
+<!-- Line Items Table -->
+<div class="space-y-space-sm py-space-sm font-body-sm text-body-sm">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Base Fare (1 Adult)</span>
+<span class="font-medium text-on-surface">₹4,450</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="flex items-center gap-1">
+                  Taxes &amp; Airport Fees
+                  <span class="material-symbols-outlined text-[14px] text-outline cursor-pointer" title="Includes K3, PSF, and Goods and Services Tax">help</span>
+</span>
+<span class="font-medium text-on-surface">₹749</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>User Development Fee</span>
+<span class="font-medium text-on-surface">₹100</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Add-ons (Travel Insurance)</span>
+<span class="font-medium text-on-surface">₹199</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Convenience Fee</span>
+<span class="font-medium text-on-surface">₹100</span>
+</div>
+</div>
+<!-- Promo Code Module -->
+<div class="my-space-md pt-space-md">
+<!-- Applied Chip -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-bold tracking-wide">FLYKART12</span>
+<span class="text-on-surface-variant font-normal">(-₹500 applied)</span>
+</div>
+<button class="text-secondary font-label-sm text-label-sm hover:underline cursor-pointer" type="button">Remove</button>
+</div>
+<!-- Input for alternative coupon -->
+<div class="flex items-center gap-space-xs">
+<input class="w-full px-space-md py-space-xs rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary uppercase tracking-wider" placeholder="Enter Coupon Code" type="text"/>
+<button class="px-space-md py-space-xs rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface font-label-md text-label-md transition-colors cursor-pointer" type="button">
+                  Apply
+                </button>
+</div>
+</div>
+<!-- Total Price Calculation Display -->
+<div class="mt-space-md pt-space-md bg-surface-container-low rounded-xl p-space-md">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider block">Total Amount</span>
+<span class="font-headline-xl text-headline-xl font-extrabold text-primary tracking-tight">₹5,098</span>
+</div>
+<span class="px-space-sm py-space-xs rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">You Saved ₹500</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-space-xs">Inclusive of all taxes, fees and applied discounts</p>
+</div>
+<!-- Big High-Contrast CTA Button -->
+<div class="mt-space-lg">
+<button class="w-full py-space-md px-space-lg rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-space-sm group cursor-pointer" type="button">
+<span>Proceed to Pay ₹5,098</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<!-- Trust & Assurance Micro-points -->
+<div class="mt-space-md space-y-space-xs">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<span>100% Safe &amp; Secure Payment Guarantee</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-primary text-[18px]">replay</span>
+<span>Instant refund process on cancellation</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-[#0B132B] text-surface-variant mt-auto"><div class="max-w-7xl mx-auto px-margin py-space-xl"><div class="flex flex-col md:flex-row items-center justify-between gap-space-md text-body-sm font-body-sm"><div class="flex items-center gap-space-sm"><div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-secondary to-secondary-container flex items-center justify-center"><span class="material-symbols-outlined text-on-secondary text-[14px]">flight_takeoff</span></div><span class="font-headline-sm text-headline-sm font-bold text-surface tracking-tight">Travel<span class="text-[#FF8A00]">Kart</span></span><span class="text-outline text-label-sm font-label-sm ml-space-sm">© 2025 TravelKart Technologies Inc. All rights reserved.</span></div><div class="flex items-center gap-space-lg text-surface-variant/80 font-label-md text-label-md"><a class="hover:text-surface transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a><a class="hover:text-surface transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="hover:text-surface transition-colors" data-path="support-center" href="#">Support</a><a class="hover:text-surface transition-colors" data-path="security" href="#">Security &amp; Trust</a></div></div></div></footer></body></html>
