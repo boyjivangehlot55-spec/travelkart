@@ -3,18 +3,31 @@ import { BookingRecord } from '../types';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 
+import { User } from 'firebase/auth';
+
 interface ConfirmationPageProps {
   bookingRecord: BookingRecord;
   onNavigateHome: () => void;
   onOpenComingSoon: (feature: string) => void;
+  user: User | null;
+  onSignIn: () => void;
+  onSignOut: () => void;
+  onNavigateTrips: () => void;
+  onNavigateWishlist: () => void;
 }
 
 export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
   bookingRecord,
   onNavigateHome,
   onOpenComingSoon,
+  user,
+  onSignIn,
+  onSignOut,
+  onNavigateTrips,
+  onNavigateWishlist,
 }) => {
-  const { flight, searchParams, passenger, addOns, pricing, bookingId } = bookingRecord;
+  const { flight, searchParams, passengers, addOns, pricing, bookingId } = bookingRecord;
+  const primaryPassenger = passengers[0];
 
   const handlePrint = () => {
     window.print();
@@ -25,7 +38,12 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
       {/* Top Navbar */}
       <Navbar
         variant="dark"
+        user={user}
+        onSignIn={onSignIn}
+        onSignOut={onSignOut}
         onNavigateHome={onNavigateHome}
+        onNavigateTrips={onNavigateTrips}
+        onNavigateWishlist={onNavigateWishlist}
         onOpenComingSoon={onOpenComingSoon}
       />
 
@@ -89,7 +107,7 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
                   Booking Confirmed!
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-100 mt-1">
-                  Confirmation e-ticket sent to <strong className="text-white">{passenger.email}</strong>
+                  Confirmation e-ticket sent to <strong className="text-white">{primaryPassenger?.email}</strong>
                 </p>
               </div>
             </div>
@@ -145,11 +163,18 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
                     </div>
                     <div className="w-2 h-2 rounded-full bg-[#0053d3]"></div>
                   </div>
-                  <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">{flight.stopsLabel}</span>
+                  <span className="text-[10px] text-slate-500 uppercase font-bold mt-1 text-center">
+                    {flight.viaCity ? `${flight.stopsLabel} via ${flight.viaCity}` : flight.stopsLabel}
+                  </span>
                 </div>
 
                 <div className="col-span-4 text-right">
-                  <div className="text-2xl font-extrabold text-[#141b2b]">{flight.arrivalTime}</div>
+                  <div className="text-2xl font-extrabold text-[#141b2b] inline-flex items-baseline justify-end gap-1.5 whitespace-nowrap">
+                    <span>{flight.arrivalTime}</span>
+                    {flight.arrivalTime < flight.departureTime && (
+                      <span className="text-[11px] font-bold text-[#ab3500] leading-none">+1 day</span>
+                    )}
+                  </div>
                   <div className="text-sm font-bold text-[#0053d3]">{searchParams.toCity.name} ({searchParams.toCity.code})</div>
                   <div className="text-xs text-slate-500">{flight.destTerminal}</div>
                 </div>
@@ -161,19 +186,29 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
               {/* Passenger Info */}
               <div className="bg-[#f1f3ff] rounded-xl p-5">
                 <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400 mb-3">
-                  Passenger Details
+                  Passenger Details ({passengers.length} {passengers.length === 1 ? 'Traveller' : 'Travellers'})
                 </h4>
-                <div className="space-y-2 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Name:</span>
-                    <span className="text-sm font-bold text-[#141b2b]">
-                      {passenger.gender === 'Male' ? 'Mr.' : passenger.gender === 'Female' ? 'Ms.' : ''} {passenger.firstName} {passenger.lastName}
-                    </span>
+                <div className="space-y-2.5 text-xs">
+                  <div className="space-y-1.5">
+                    <span className="text-slate-500 block">Passengers:</span>
+                    {passengers.map((p) => {
+                      const title = p.gender === 'Male' ? 'Mr.' : p.gender === 'Female' ? 'Ms.' : '';
+                      return (
+                        <div key={p.id} className="flex items-center justify-between gap-2 bg-white/80 rounded-lg px-3 py-1.5">
+                          <span className="text-sm font-bold text-[#141b2b]">
+                            {title ? `${title} ` : ''}{p.firstName} {p.lastName}
+                          </span>
+                          <span className="text-[11px] font-semibold text-[#0053d3] shrink-0">
+                            {p.label}{p.type === 'Child' && p.age ? ` • Age ${p.age} yrs` : ''}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Contact:</span>
+                    <span className="text-slate-500 block">Primary Contact:</span>
                     <span className="font-semibold text-[#141b2b]">
-                      +91 {passenger.mobile} • {passenger.email}
+                      +91 {primaryPassenger?.mobile} • {primaryPassenger?.email}
                     </span>
                   </div>
                   <div>

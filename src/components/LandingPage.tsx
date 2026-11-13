@@ -1,14 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { City, SearchParams } from '../types';
-import { CITIES, POPULAR_ROUTES } from '../data/flightData';
+import { CITIES, POPULAR_ROUTES, getTodayDateString, getDateInfo } from '../data/flightData';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+
+import { User } from 'firebase/auth';
 
 interface LandingPageProps {
   searchParams: SearchParams;
   setSearchParams: React.Dispatch<React.SetStateAction<SearchParams>>;
   onSearch: () => void;
   onOpenComingSoon: (feature: string) => void;
+  user: User | null;
+  onSignIn: () => void;
+  onSignOut: () => void;
+  onNavigateTrips: () => void;
+  onNavigateWishlist: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
@@ -16,6 +23,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   setSearchParams,
   onSearch,
   onOpenComingSoon,
+  user,
+  onSignIn,
+  onSignOut,
+  onNavigateTrips,
+  onNavigateWishlist,
 }) => {
   // Dropdown states for search card
   const [isFromOpen, setIsFromOpen] = useState(false);
@@ -27,6 +39,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // Offers tab state (All Offers, Flights, Hotels, Holidays)
   const [activeOfferTab, setActiveOfferTab] = useState<'All' | 'Flights' | 'Hotels' | 'Holidays'>('All');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   const fromRef = useRef<HTMLDivElement>(null);
   const toRef = useRef<HTMLDivElement>(null);
@@ -60,6 +73,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // Handle Swap
   const handleSwapCities = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setRouteError(null);
     setSearchParams((prev) => ({
       ...prev,
       fromCity: prev.toCity,
@@ -67,14 +81,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     }));
   };
 
-  // Parse YYYY-MM-DD locally to avoid timezone date shifting
-  const parseLocalDate = (dateStr: string) => {
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  // Validate route before navigating to Results
+  const handleAttemptSearch = () => {
+    if (searchParams.fromCity.code === searchParams.toCity.code) {
+      setRouteError('Please choose two different cities');
+      window.scrollTo({ top: 180, behavior: 'smooth' });
+      return;
     }
-    return new Date(dateStr);
+    setRouteError(null);
+    onSearch();
   };
+
+  // Real device current date bounds for date pickers
+  const todayStr = getTodayDateString();
+  const minReturnDate =
+    searchParams.departureDate >= todayStr ? searchParams.departureDate : todayStr;
 
   // Copy offer code helper with safe fallback
   const handleCopyCode = (code: string) => {
@@ -93,6 +114,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   // Select popular destination
   const handleSelectPopularRoute = (cityName: string) => {
+    setRouteError(null);
     const foundCity = CITIES.find((c) => c.name.toLowerCase() === cityName.toLowerCase());
     if (foundCity) {
       setSearchParams((prev) => ({
@@ -117,8 +139,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="bg-[#F4F5F8] font-sans antialiased text-slate-800 m-0 p-0 min-h-screen flex flex-col">
-      {/* ===================== HERO SECTION ===================== */}
-      <section className="relative w-full h-[520px] lg:h-[560px] overflow-visible" data-purpose="hero-container">
+      {/* ===================== HERO SECTION (Contains Navbar + Search Hub) ===================== */}
+      <section className="relative w-full overflow-visible pb-[64px]" data-purpose="hero-container">
         {/* Hero Background Image with sunset and gradient overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden" data-purpose="background-media">
           <img
@@ -132,13 +154,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Top Navigation */}
         <Navbar
           variant="transparent"
+          user={user}
+          onSignIn={onSignIn}
+          onSignOut={onSignOut}
           onNavigateHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onNavigateTrips={onNavigateTrips}
+          onNavigateWishlist={onNavigateWishlist}
           onOpenComingSoon={onOpenComingSoon}
         />
-      </section>
 
-      {/* ===================== MAIN SEARCH HUB (OVERLAPS HERO) ===================== */}
-      <main className="relative z-30 max-w-[1080px] mx-auto px-4 -mt-[380px] lg:-mt-[410px] pb-16 w-full" data-purpose="main-booking-hub">
+        {/* ===================== MAIN SEARCH HUB (OVERLAPS HERO) ===================== */}
+        <main className="relative z-30 w-[90%] max-w-[1280px] mx-auto mt-8 sm:mt-12 lg:mt-14" data-purpose="main-booking-hub">
         {/* 2. CATEGORY TAB CARD */}
         <div className="bg-white rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.14)] border border-slate-100 px-3 sm:px-6 pt-3 pb-2.5 mb-2 relative z-10" data-purpose="floating-category-strip-wrapper">
           <nav aria-label="Travel Categories" className="flex items-end justify-between overflow-x-auto no-scrollbar gap-2">
@@ -365,19 +391,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Round Trip */}
               <label 
-                onClick={() => setSearchParams((prev) => ({ 
-                  ...prev, 
-                  tripType: 'roundtrip',
-                  returnDate: prev.returnDate || '2026-11-07',
-                  returnDisplayDate: prev.returnDisplayDate || "07 Nov'26",
-                  returnDay: prev.returnDay || 'Saturday'
-                }))}
-                className="flex items-center gap-2 cursor-pointer group"
+                onClick={() => {
+                  setSearchParams((prev) => ({ ...prev, tripType: 'oneway' }));
+                  onOpenComingSoon('Round Trip Flights');
+                }}
+                className="flex items-center gap-2 cursor-pointer group text-slate-600 font-semibold"
               >
-                <div className={`w-4 h-4 rounded-full border-2 ${searchParams.tripType === 'roundtrip' ? 'border-[#065AF3]' : 'border-slate-300'} flex items-center justify-center bg-white`}>
-                  {searchParams.tripType === 'roundtrip' && <div className="w-2 h-2 rounded-full bg-[#065AF3]"></div>}
-                </div>
-                <span className={searchParams.tripType === 'roundtrip' ? 'text-slate-900' : 'text-slate-600 font-semibold group-hover:text-slate-900'}>Round Trip</span>
+                <div className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center bg-white group-hover:border-slate-400"></div>
+                <span className="group-hover:text-slate-900 transition-colors">Round Trip</span>
               </label>
 
               {/* Multi City */}
@@ -424,16 +445,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div
                       key={city.code}
                       onClick={() => {
-                        // Prevent same From & To
-                        if (city.code === searchParams.toCity.code) {
-                          setSearchParams((prev) => ({
-                            ...prev,
-                            toCity: prev.fromCity,
-                            fromCity: city,
-                          }));
-                        } else {
-                          setSearchParams((prev) => ({ ...prev, fromCity: city }));
-                        }
+                        setRouteError(null);
+                        setSearchParams((prev) => ({ ...prev, fromCity: city }));
                         setIsFromOpen(false);
                       }}
                       className={`px-3 py-2.5 flex items-center justify-between hover:bg-blue-50 cursor-pointer transition-colors ${
@@ -494,16 +507,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div
                       key={city.code}
                       onClick={() => {
-                        // Prevent same From & To
-                        if (city.code === searchParams.fromCity.code) {
-                          setSearchParams((prev) => ({
-                            ...prev,
-                            fromCity: prev.toCity,
-                            toCity: city,
-                          }));
-                        } else {
-                          setSearchParams((prev) => ({ ...prev, toCity: city }));
-                        }
+                        setRouteError(null);
+                        setSearchParams((prev) => ({ ...prev, toCity: city }));
                         setIsToOpen(false);
                       }}
                       className={`px-3 py-2.5 flex items-center justify-between hover:bg-blue-50 cursor-pointer transition-colors ${
@@ -542,7 +547,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </svg>
               </div>
               <p className="text-2xl font-black text-slate-900 leading-none tracking-tight">
-                {searchParams.departureDisplayDate.split(' ')[0]} <span className="text-xl font-bold">{searchParams.departureDisplayDate.split(' ')[1] || "Oct'26"}</span>
+                {searchParams.departureDisplayDate.split(' ')[0]} <span className="text-xl font-bold">{searchParams.departureDisplayDate.split(' ')[1] || ''}</span>
               </p>
               <p className="text-xs text-slate-500 mt-1.5 font-medium">{searchParams.departureDay}</p>
 
@@ -555,21 +560,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div className="text-xs font-bold text-slate-800 mb-2">Select Departure Date</div>
                   <input
                     type="date"
+                    min={todayStr}
                     value={searchParams.departureDate}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (!val) return;
-                      const dateObj = parseLocalDate(val);
-                      const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                      const dayNum = dateObj.getDate();
-                      const monthName = dateObj.toLocaleDateString('en-US', { month: 'short' });
-                      const year = String(dateObj.getFullYear()).slice(-2);
-                      setSearchParams((prev) => ({
-                        ...prev,
-                        departureDate: val,
-                        departureDisplayDate: `${dayNum} ${monthName}'${year}`,
-                        departureDay: dayName,
-                      }));
+                      const safeVal = val < todayStr ? todayStr : val;
+                      const depInfo = getDateInfo(safeVal, 0);
+                      setSearchParams((prev) => {
+                        const needsReturnUpdate =
+                          prev.tripType === 'roundtrip' &&
+                          (!prev.returnDate || prev.returnDate < safeVal);
+                        return {
+                          ...prev,
+                          departureDate: depInfo.isoDate,
+                          departureDisplayDate: depInfo.displayDate,
+                          departureDay: depInfo.dayName,
+                          ...(needsReturnUpdate
+                            ? {
+                                returnDate: depInfo.isoDate,
+                                returnDisplayDate: depInfo.displayDate,
+                                returnDay: depInfo.dayName,
+                              }
+                            : {}),
+                        };
+                      });
                       setIsDepDateOpen(false);
                     }}
                     className="w-full p-2 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#065AF3]"
@@ -585,21 +600,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div 
               ref={retDateRef}
               onClick={() => {
-                if (searchParams.tripType !== 'roundtrip') {
-                  // Switch to round trip automatically
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    tripType: 'roundtrip',
-                    returnDate: prev.returnDate || '2026-11-07',
-                    returnDisplayDate: prev.returnDisplayDate || "07 Nov'26",
-                    returnDay: prev.returnDay || 'Saturday'
-                  }));
-                }
-                setIsRetDateOpen(!isRetDateOpen);
+                setSearchParams((prev) => ({ ...prev, tripType: 'oneway' }));
+                setIsRetDateOpen(false);
                 setIsFromOpen(false);
                 setIsToOpen(false);
                 setIsTravellersOpen(false);
                 setIsDepDateOpen(false);
+                onOpenComingSoon('Round Trip Flights');
               }}
               className={`md:col-span-2 p-4 transition-colors cursor-pointer relative ${
                 searchParams.tripType === 'roundtrip' ? 'hover:bg-blue-50/30' : 'bg-slate-50/60'
@@ -615,7 +622,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {searchParams.tripType === 'roundtrip' ? (
                 <>
                   <p className="text-2xl font-black text-slate-900 leading-none tracking-tight">
-                    {searchParams.returnDisplayDate?.split(' ')[0]} <span className="text-xl font-bold">{searchParams.returnDisplayDate?.split(' ')[1] || "Nov'26"}</span>
+                    {searchParams.returnDisplayDate?.split(' ')[0]} <span className="text-xl font-bold">{searchParams.returnDisplayDate?.split(' ')[1] || ''}</span>
                   </p>
                   <p className="text-xs text-slate-500 mt-1.5 font-medium">{searchParams.returnDay}</p>
                 </>
@@ -634,21 +641,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div className="text-xs font-bold text-slate-800 mb-2">Select Return Date</div>
                   <input
                     type="date"
-                    min={searchParams.departureDate}
-                    value={searchParams.returnDate || '2026-11-07'}
+                    min={minReturnDate}
+                    value={searchParams.returnDate || getDateInfo(searchParams.departureDate, 7).isoDate}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (!val) return;
-                      const dateObj = parseLocalDate(val);
-                      const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                      const dayNum = dateObj.getDate();
-                      const monthName = dateObj.toLocaleDateString('en-US', { month: 'short' });
-                      const year = String(dateObj.getFullYear()).slice(-2);
+                      const safeVal = val < minReturnDate ? minReturnDate : val;
+                      const retInfo = getDateInfo(safeVal, 0);
                       setSearchParams((prev) => ({
                         ...prev,
-                        returnDate: val,
-                        returnDisplayDate: `${dayNum} ${monthName}'${year}`,
-                        returnDay: dayName,
+                        returnDate: retInfo.isoDate,
+                        returnDisplayDate: retInfo.displayDate,
+                        returnDay: retInfo.dayName,
                       }));
                       setIsRetDateOpen(false);
                     }}
@@ -892,10 +896,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
+          {/* Same-city route validation message */}
+          {routeError && (
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#ba1a1a] bg-[#ffdad6]/60 px-3 py-2 rounded-lg" role="alert">
+              <span className="material-symbols-outlined text-[16px]">error</span>
+              <span>{routeError}</span>
+            </div>
+          )}
+
           {/* CTA SEARCH Button (Overlapping Bottom Edge) */}
           <div className="absolute left-1/2 -translate-x-1/2 -bottom-6">
             <button
-              onClick={onSearch}
+              onClick={handleAttemptSearch}
               className="bg-gradient-to-r from-[#065AF3] to-[#0084FF] hover:from-[#054ecf] hover:to-[#0074e0] text-white font-black text-lg tracking-wider px-14 py-3.5 rounded-full shadow-[0_10px_25px_rgba(6,90,243,0.45)] hover:shadow-[0_12px_28px_rgba(6,90,243,0.55)] transition-all hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
               type="button"
             >
@@ -903,13 +915,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
           </div>
         </div>
-      </main>
+        </main>
+      </section>
 
       {/* ===================== LOWER PART (Popular Routes, Banner, Offers, Benefits) ===================== */}
       <div className="w-full flex-1">
-        {/* SECTION 1: Popular Flight Routes Card (3x3 Grid) */}
-        <div className="pt-8 sm:pt-12 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="max-w-6xl mx-auto rounded-3xl p-6 sm:p-8 md:p-10 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] border border-slate-100 transition-all">
+        {/* SECTION 1: Popular Flight Routes Card (24px below hero photo edge, aligned with search card) */}
+        <div className="pt-[24px] pb-6 w-[90%] max-w-[1280px] mx-auto">
+          <div className="w-full rounded-3xl p-6 sm:p-8 md:p-10 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] border border-slate-100 transition-all">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1A6BFF] text-xs font-bold tracking-wide uppercase mb-2">
@@ -989,7 +1002,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <div className="shrink-0 z-10 w-full md:w-auto text-center">
               <button
-                onClick={onSearch}
+                onClick={handleAttemptSearch}
                 className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-orange-500/25 transition-all text-sm sm:text-base w-full md:w-auto cursor-pointer"
                 type="button"
               >
@@ -1106,7 +1119,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                 </div>
                 <button
-                  onClick={onSearch}
+                  onClick={handleAttemptSearch}
                   className="w-full py-2.5 rounded-xl bg-[#1A6BFF] hover:bg-[#0E55DF] text-white text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   Book Now
@@ -1198,7 +1211,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   onClick={() => {
                     setSearchParams((prev) => ({ ...prev, specialFare: 'Student' }));
-                    onSearch();
+                    handleAttemptSearch();
                   }}
                   className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-1.5 border border-slate-200 cursor-pointer"
                 >

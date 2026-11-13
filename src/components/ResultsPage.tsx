@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { User } from 'firebase/auth';
 import { Flight, SearchParams } from '../types';
-import { FLIGHTS } from '../data/flightData';
-import { Navbar } from './Navbar';
+import { generateFlightsForSearch } from '../data/flightData';
+import { buildWishlistItemId } from '../firebase';
+import { Navbar, BrandLogo } from './Navbar';
 
 interface ResultsPageProps {
   searchParams: SearchParams;
@@ -9,6 +11,14 @@ interface ResultsPageProps {
   onModifySearch: () => void;
   onNavigateHome: () => void;
   onOpenComingSoon: (feature: string) => void;
+  user: User | null;
+  onSignIn: () => void;
+  onSignOut: () => void;
+  onNavigateTrips: () => void;
+  onNavigateWishlist: () => void;
+  wishlistIds: Set<string>;
+  onToggleWishlist: (flight: Flight) => void;
+  wishlistError?: string | null;
 }
 
 export const ResultsPage: React.FC<ResultsPageProps> = ({
@@ -17,21 +27,85 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
   onModifySearch,
   onNavigateHome,
   onOpenComingSoon,
+  user,
+  onSignIn,
+  onSignOut,
+  onNavigateTrips,
+  onNavigateWishlist,
+  wishlistIds,
+  onToggleWishlist,
+  wishlistError = null,
 }) => {
+  // Generate dynamic flights based on route, date, and cabin class
+  const { flights: allFlights, usualSavings } = useMemo(
+    () => generateFlightsForSearch(searchParams),
+    [searchParams.fromCity.code, searchParams.toCity.code, searchParams.departureDate, searchParams.cabinClass]
+  );
+
+  // Derived metrics from the generated flight list
+  const flightMetrics = useMemo(() => {
+    const prices = allFlights.map((f) => f.basePrice);
+    const minPrice = Math.min(...prices);
+    const maxPriceBound = Math.max(...prices);
+
+    const nonStopFlights = allFlights.filter((f) => f.stops === 0);
+    const oneStopFlights = allFlights.filter((f) => f.stops === 1);
+    const refundableFlights = allFlights.filter((f) => f.refundable);
+
+    const cheapestFlight = allFlights.reduce((best, f) => (f.basePrice < best.basePrice ? f : best), allFlights[0]);
+    const fastestFlight = allFlights.reduce((best, f) => (f.durationMinutes < best.durationMinutes ? f : best), allFlights[0]);
+    const earliestFlight = allFlights.reduce(
+      (best, f) => (f.departureTime.localeCompare(best.departureTime) < 0 ? f : best),
+      allFlights[0]
+    );
+
+    const airlineMinPrices: Record<string, number | null> = {
+      IndiGo: null,
+      'Akasa Air': null,
+      'Air India': null,
+      'Air India Express': null,
+      SpiceJet: null,
+    };
+    for (const f of allFlights) {
+      const prev = airlineMinPrices[f.airline];
+      if (prev === null || f.basePrice < prev) {
+        airlineMinPrices[f.airline] = f.basePrice;
+      }
+    }
+
+    return {
+      minPrice,
+      maxPriceBound,
+      nonStopCount: nonStopFlights.length,
+      oneStopCount: oneStopFlights.length,
+      lowestNonStopPrice: nonStopFlights.length ? Math.min(...nonStopFlights.map((f) => f.basePrice)) : null,
+      lowestRefundablePrice: refundableFlights.length ? Math.min(...refundableFlights.map((f) => f.basePrice)) : null,
+      cheapestFlight,
+      fastestFlight,
+      earliestFlight,
+      airlineMinPrices,
+    };
+  }, [allFlights]);
+
   // Filter states
   const [filterNonStopOnly, setFilterNonStopOnly] = useState<boolean>(true);
   const [filterRefundableOnly, setFilterRefundableOnly] = useState<boolean>(false);
   const [filterMorningOnly, setFilterMorningOnly] = useState<boolean>(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<'all' | 'early' | 'morning' | 'afternoon' | 'night'>('all');
-  const [maxPrice, setMaxPrice] = useState<number>(9500);
+  const [maxPrice, setMaxPrice] = useState<number>(flightMetrics.maxPriceBound);
   const [stopsFilter, setStopsFilter] = useState<'all' | 'nonstop' | '1stop' | '2plus'>('nonstop');
   const [selectedAirlines, setSelectedAirlines] = useState<string[]>([
     'IndiGo',
     'Akasa Air',
     'Air India',
-    'Vistara',
+    'Air India Express',
     'SpiceJet',
   ]);
+
+  // Keep price slider cap updated when generated flights change (e.g. route/date/class)
+  useEffect(() => {
+    setMaxPrice(flightMetrics.maxPriceBound);
+  }, [flightMetrics.maxPriceBound]);
 
   // Sort states
   const [activeSortTab, setActiveSortTab] = useState<'cheapest' | 'fastest' | 'earliest' | null>('cheapest');
@@ -47,9 +121,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
     setFilterRefundableOnly(false);
     setFilterMorningOnly(false);
     setSelectedTimeSlot('all');
-    setMaxPrice(12500);
+    setMaxPrice(flightMetrics.maxPriceBound);
     setStopsFilter('all');
-    setSelectedAirlines(['IndiGo', 'Akasa Air', 'Air India', 'Vistara', 'SpiceJet']);
+    setSelectedAirlines(['IndiGo', 'Akasa Air', 'Air India', 'Air India Express', 'SpiceJet']);
   };
 
   // Synchronize Popular Non-Stop Checkbox and Stops Radio
@@ -90,7 +164,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
   // Filter & Sort flights
   const filteredFlights = useMemo(() => {
-    let result = [...FLIGHTS];
+    let result = [...allFlights];
 
     // Stops filter & Popular non-stop
     if (stopsFilter === '1stop') {
@@ -118,7 +192,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
     result = result.filter((f) => f.basePrice <= maxPrice);
 
     // Airlines
-    if (selectedAirlines.length > 0) {
+    if (selectedAirlines.length === 0) {
+      result = [];
+    } else {
       result = result.filter((f) => selectedAirlines.includes(f.airline));
     }
 
@@ -137,6 +213,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
     return result;
   }, [
+    allFlights,
     filterNonStopOnly,
     filterRefundableOnly,
     filterMorningOnly,
@@ -148,15 +225,25 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
   ]);
 
   const displayedFlights = filteredFlights.slice(0, visibleCount);
+  const travellerLabel = `${searchParams.adults} ${searchParams.adults === 1 ? 'Adult' : 'Adults'}${
+    searchParams.children > 0
+      ? `, ${searchParams.children} ${searchParams.children === 1 ? 'Child' : 'Children'}`
+      : ''
+  }`;
 
   return (
     <div className="bg-[#f1f3ff] font-body-md text-[#141b2b] antialiased min-h-screen flex flex-col">
       {/* ===================== FIXED TOP NAVIGATION ===================== */}
-      <header className="fixed top-0 left-0 right-0 z-50 shadow-[0_4px_20px_rgba(0,0,0,0.12)]">
+      <div className="fixed top-0 left-0 right-0 z-50 shadow-[0_4px_20px_rgba(0,0,0,0.12)]">
         {/* Row 1: Navbar */}
         <Navbar
           variant="dark"
+          user={user}
+          onSignIn={onSignIn}
+          onSignOut={onSignOut}
           onNavigateHome={onNavigateHome}
+          onNavigateTrips={onNavigateTrips}
+          onNavigateWishlist={onNavigateWishlist}
           onOpenComingSoon={onOpenComingSoon}
         />
 
@@ -177,7 +264,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
             <div className="hidden md:flex items-center gap-1.5 text-slate-200 shrink-0 font-medium">
               <span className="material-symbols-outlined text-[16px]">person</span>
               <span>
-                {searchParams.adults + searchParams.children} {searchParams.adults + searchParams.children === 1 ? 'Adult' : 'Travellers'}, {searchParams.cabinClass}
+                {travellerLabel}, {searchParams.cabinClass}
               </span>
             </div>
           </div>
@@ -191,11 +278,16 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
             <span>Modify Search</span>
           </button>
         </div>
-      </header>
+      </div>
 
       {/* ===================== MAIN CONTENT WRAPPER ===================== */}
       <main className="min-h-[calc(100vh-120px-40px)] pt-[144px] sm:pt-[152px] pb-12 px-4 sm:px-8 max-w-7xl mx-auto w-full">
         <div className="flex flex-col w-full">
+          {wishlistError && (
+            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+              {wishlistError}
+            </div>
+          )}
           {/* Quick Insights Banner */}
           <div className="w-full mb-6">
             <div className="bg-white rounded-xl shadow-xs p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border border-slate-100">
@@ -206,7 +298,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-headline-sm text-base sm:text-lg text-[#141b2b] font-bold">
-                      Fares are ₹720 lower than usual
+                      Fares are ₹{usualSavings.toLocaleString('en-IN')} lower than usual
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#ffdbd0] text-[#390c00] text-[10px] font-bold uppercase tracking-wider">
                       High Demand
@@ -249,7 +341,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     <span className="material-symbols-outlined text-[#0053d3] text-[20px]">tune</span>
                     <h2 className="font-headline-sm text-base font-bold text-[#141b2b]">Filters</h2>
                     <span className="ml-1 px-2 py-0.5 rounded-full bg-[#e9edff] text-[#0053d3] text-xs font-semibold">
-                      {filteredFlights.length} flights
+                      {filteredFlights.length} {filteredFlights.length === 1 ? 'flight' : 'flights'}
                     </span>
                   </div>
                   <button
@@ -277,7 +369,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         />
                         <span className="text-sm font-medium text-[#141b2b]">Non Stop</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹5,299</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.lowestNonStopPrice !== null ? `₹${flightMetrics.lowestNonStopPrice.toLocaleString('en-IN')}` : '—'}
+                      </span>
                     </label>
 
                     <label className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
@@ -290,7 +384,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         />
                         <span className="text-sm font-medium text-[#141b2b]">Refundable Fares</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹5,850</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.lowestRefundablePrice !== null ? `₹${flightMetrics.lowestRefundablePrice.toLocaleString('en-IN')}` : '—'}
+                      </span>
                     </label>
 
                     <label className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
@@ -391,16 +487,16 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                   <div className="px-1">
                     <input
                       type="range"
-                      min="4899"
-                      max="12500"
+                      min={flightMetrics.minPrice}
+                      max={flightMetrics.maxPriceBound}
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Number(e.target.value))}
                       className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0053d3]"
                     />
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                    <span>₹4,899</span>
-                    <span>₹12,500</span>
+                    <span>₹{flightMetrics.minPrice.toLocaleString('en-IN')}</span>
+                    <span>₹{flightMetrics.maxPriceBound.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
@@ -419,7 +515,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         />
                         <span className="text-sm font-medium text-[#141b2b]">All Stops</span>
                       </div>
-                      <span className="text-xs text-slate-400">12 flights</span>
+                      <span className="text-xs text-slate-400">{allFlights.length} flights</span>
                     </label>
 
                     <label className="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-slate-50 cursor-pointer">
@@ -433,7 +529,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         />
                         <span className="text-sm font-medium text-[#141b2b]">Non Stop Only</span>
                       </div>
-                      <span className="text-xs text-slate-400">11 flights</span>
+                      <span className="text-xs text-slate-400">
+                        {flightMetrics.nonStopCount} {flightMetrics.nonStopCount === 1 ? 'flight' : 'flights'}
+                      </span>
                     </label>
 
                     <label className="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-slate-50 cursor-pointer">
@@ -447,7 +545,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         />
                         <span className="text-sm font-medium text-[#141b2b]">1 Stop</span>
                       </div>
-                      <span className="text-xs text-slate-400">1 flight</span>
+                      <span className="text-xs text-slate-400">
+                        {flightMetrics.oneStopCount} {flightMetrics.oneStopCount === 1 ? 'flight' : 'flights'}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -470,7 +570,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         </div>
                         <span className="text-sm font-medium text-[#141b2b]">IndiGo</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹5,299</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.airlineMinPrices['IndiGo'] !== null
+                          ? `₹${flightMetrics.airlineMinPrices['IndiGo']!.toLocaleString('en-IN')}`
+                          : '—'}
+                      </span>
                     </label>
 
                     {/* Akasa Air */}
@@ -487,7 +591,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         </div>
                         <span className="text-sm font-medium text-[#141b2b]">Akasa Air</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹5,150</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.airlineMinPrices['Akasa Air'] !== null
+                          ? `₹${flightMetrics.airlineMinPrices['Akasa Air']!.toLocaleString('en-IN')}`
+                          : '—'}
+                      </span>
                     </label>
 
                     {/* Air India */}
@@ -504,24 +612,32 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         </div>
                         <span className="text-sm font-medium text-[#141b2b]">Air India</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹5,850</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.airlineMinPrices['Air India'] !== null
+                          ? `₹${flightMetrics.airlineMinPrices['Air India']!.toLocaleString('en-IN')}`
+                          : '—'}
+                      </span>
                     </label>
 
-                    {/* Vistara */}
+                    {/* Air India Express */}
                     <label className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer">
                       <div className="flex items-center gap-2.5">
                         <input
                           type="checkbox"
-                          checked={selectedAirlines.includes('Vistara')}
-                          onChange={() => handleToggleAirline('Vistara')}
+                          checked={selectedAirlines.includes('Air India Express')}
+                          onChange={() => handleToggleAirline('Air India Express')}
                           className="w-4 h-4 rounded text-[#0053d3] accent-[#0053d3]"
                         />
                         <div className="w-5 h-5 rounded-full bg-[#5d1900] flex items-center justify-center text-[#ffdbd0] text-[10px] font-bold">
-                          UK
+                          IX
                         </div>
-                        <span className="text-sm font-medium text-[#141b2b]">Vistara</span>
+                        <span className="text-sm font-medium text-[#141b2b]">Air India Express</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹6,120</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.airlineMinPrices['Air India Express'] !== null
+                          ? `₹${flightMetrics.airlineMinPrices['Air India Express']!.toLocaleString('en-IN')}`
+                          : '—'}
+                      </span>
                     </label>
 
                     {/* SpiceJet */}
@@ -538,7 +654,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         </div>
                         <span className="text-sm font-medium text-[#141b2b]">SpiceJet</span>
                       </div>
-                      <span className="text-xs text-slate-600 font-semibold">₹4,999</span>
+                      <span className="text-xs text-slate-600 font-semibold">
+                        {flightMetrics.airlineMinPrices['SpiceJet'] !== null
+                          ? `₹${flightMetrics.airlineMinPrices['SpiceJet']!.toLocaleString('en-IN')}`
+                          : '—'}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -564,7 +684,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     <div className="flex flex-col text-left">
                       <span className="text-xs font-bold leading-tight">Cheapest</span>
                       <span className={`text-[10px] ${activeSortTab === 'cheapest' ? 'text-blue-100' : 'text-slate-400'}`}>
-                        ₹4,899 • 2h 45m
+                        ₹{flightMetrics.cheapestFlight.basePrice.toLocaleString('en-IN')} • {flightMetrics.cheapestFlight.duration}
                       </span>
                     </div>
                   </button>
@@ -583,7 +703,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     <div className="flex flex-col text-left">
                       <span className="text-xs font-bold leading-tight">Fastest</span>
                       <span className={`text-[10px] ${activeSortTab === 'fastest' ? 'text-blue-100' : 'text-slate-400'}`}>
-                        ₹6,120 • 2h 40m
+                        ₹{flightMetrics.fastestFlight.basePrice.toLocaleString('en-IN')} • {flightMetrics.fastestFlight.duration}
                       </span>
                     </div>
                   </button>
@@ -602,7 +722,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     <div className="flex flex-col text-left">
                       <span className="text-xs font-bold leading-tight">Earliest</span>
                       <span className={`text-[10px] ${activeSortTab === 'earliest' ? 'text-blue-100' : 'text-slate-400'}`}>
-                        ₹4,899 • 05:30 AM
+                        ₹{flightMetrics.earliestFlight.basePrice.toLocaleString('en-IN')} • {flightMetrics.earliestFlight.departureTime}
                       </span>
                     </div>
                   </button>
@@ -642,6 +762,12 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                 ) : (
                   displayedFlights.map((flight) => {
                     const isExpanded = expandedFlightId === flight.id;
+                    const wishlistItemId = buildWishlistItemId(
+                      flight.id,
+                      searchParams.departureDate,
+                      searchParams.cabinClass
+                    );
+                    const isWishlisted = wishlistIds.has(wishlistItemId);
                     const badgeColor =
                       flight.airlineCode === '6E'
                         ? 'bg-[#1a6bff] text-white'
@@ -649,7 +775,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                         ? 'bg-[#fe6a34] text-white'
                         : flight.airlineCode === 'AI'
                         ? 'bg-[#ba1a1a] text-white'
-                        : flight.airlineCode === 'UK'
+                        : flight.airlineCode === 'IX'
                         ? 'bg-[#5d1900] text-[#ffdbd0]'
                         : 'bg-[#ab3500] text-white';
 
@@ -725,8 +851,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
                               {/* Destination */}
                               <div className="text-right shrink-0">
-                                <div className="font-headline-md text-xl sm:text-2xl font-bold text-[#141b2b]">
-                                  {flight.arrivalTime}
+                                <div className="font-headline-md text-xl sm:text-2xl font-bold text-[#141b2b] inline-flex items-baseline justify-end gap-1 whitespace-nowrap">
+                                  <span>{flight.arrivalTime}</span>
+                                  {flight.arrivalTime < flight.departureTime && (
+                                    <span className="text-[10px] font-bold text-[#ab3500] leading-none">+1 day</span>
+                                  )}
                                 </div>
                                 <div className="font-label-lg text-xs font-bold text-[#424655]">
                                   {searchParams.toCity.code}
@@ -738,22 +867,50 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                             </div>
 
                             {/* Fare Action Column (STRICT: "View Prices" on one line) */}
-                            <div className="col-span-12 sm:col-span-3 flex sm:flex-col items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0">
-                              <div className="text-right">
-                                {flight.originalPrice && (
-                                  <div className="text-xs text-slate-400 line-through">
-                                    ₹{flight.originalPrice.toLocaleString('en-IN')}
+                            <div className="col-span-12 sm:col-span-3 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0">
+                              <div className="flex items-center gap-2.5 sm:flex-row-reverse">
+                                <button
+                                  type="button"
+                                  onClick={() => onToggleWishlist(flight)}
+                                  aria-label={isWishlisted ? 'Remove from Wishlist' : 'Save to Wishlist'}
+                                  title={isWishlisted ? 'Remove from Wishlist' : 'Save to Wishlist'}
+                                  data-purpose="wishlist-heart-button"
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                                    isWishlisted
+                                      ? 'bg-rose-50 text-rose-500 hover:bg-rose-100'
+                                      : 'bg-slate-100 text-slate-400 hover:text-rose-500 hover:bg-rose-50'
+                                  }`}
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill={isWishlisted ? 'currentColor' : 'none'}
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    />
+                                  </svg>
+                                </button>
+                                <div className="text-left sm:text-right">
+                                  {flight.originalPrice && (
+                                    <div className="text-xs text-slate-400 line-through">
+                                      ₹{flight.originalPrice.toLocaleString('en-IN')}
+                                    </div>
+                                  )}
+                                  <div className="font-headline-lg text-xl sm:text-2xl font-bold text-[#141b2b]">
+                                    ₹{flight.basePrice.toLocaleString('en-IN')}
                                   </div>
-                                )}
-                                <div className="font-headline-lg text-xl sm:text-2xl font-bold text-[#141b2b]">
-                                  ₹{flight.basePrice.toLocaleString('en-IN')}
+                                  <div className="text-[10px] text-slate-400">per adult + taxes</div>
                                 </div>
-                                <div className="text-[10px] text-slate-400">per adult + taxes</div>
                               </div>
 
                               <button
                                 onClick={() => onSelectFlight(flight)}
-                                className="mt-2 px-5 sm:px-6 py-2 rounded-full bg-[#0053d3] hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                                className="sm:mt-2 px-5 sm:px-6 py-2 rounded-full bg-[#0053d3] hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
                                 type="button"
                               >
                                 <span>View Prices</span>
@@ -810,10 +967,13 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                                   </p>
                                   <p className="text-slate-600">Date change permitted up to 2 hrs before flight</p>
                                 </div>
-                                <div>
-                                  <span className="font-bold text-[#141b2b] block mb-1">Aircraft & Perks</span>
+                                  <div>
+                                  <span className="font-bold text-[#141b2b] block mb-1">Aircraft &amp; Perks</span>
                                   <p className="text-slate-600">{flight.aircraft} with standard legroom</p>
                                   <p className="text-slate-600">{flight.amenities.join(', ')}</p>
+                                  {flight.viaCity && (
+                                    <p className="text-[#0053d3] font-semibold mt-0.5">1 Stop via {flight.viaCity}</p>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -847,8 +1007,13 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
       </main>
 
       {/* Footer bar */}
-      <footer className="mt-auto h-12 bg-[#0B132B] text-slate-400 px-4 sm:px-8 flex items-center justify-between text-xs">
-        <div>© 2026 TravelKart. Educational project. All rights reserved.</div>
+      <footer className="mt-auto min-h-12 py-3 bg-[#0B132B] text-slate-400 px-6 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3 flex-wrap">
+          <BrandLogo onClick={onNavigateHome} size="sm" />
+          <span className="text-slate-600 hidden sm:inline">•</span>
+          <div>© 2026 TravelKart. Educational project. All rights reserved.</div>
+        </div>
+        <div>Fares shown are simulated for this educational project</div>
         <div className="flex items-center gap-6">
           <span className="hidden sm:inline text-slate-500">Secure Flight Engine v2.4</span>
           <button 

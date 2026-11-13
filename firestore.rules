@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny everything outside explicitly matched user paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUserOwnedDoc(data, userId) {
+      return data is map
+        && (!('userId' in data) || (data.userId is string && data.userId == userId && data.userId == request.auth.uid));
+    }
+
+    // Strictly owner-only trips under /users/{userId}/trips/{tripId}
+    match /users/{userId}/trips/{tripId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidUserOwnedDoc(incoming(), userId);
+      allow update: if isOwner(userId) && isValidUserOwnedDoc(incoming(), userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Strictly owner-only wishlist under /users/{userId}/wishlist/{itemId}
+    match /users/{userId}/wishlist/{itemId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidUserOwnedDoc(incoming(), userId);
+      allow update: if isOwner(userId) && isValidUserOwnedDoc(incoming(), userId);
+      allow delete: if isOwner(userId);
+    }
+  }
+}

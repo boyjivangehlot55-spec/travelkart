@@ -1,0 +1,335 @@
+{
+  "entities": {
+    "CitySummary": {
+      "title": "CitySummary",
+      "description": "Origin or destination city summary",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "City display name",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "code": {
+          "type": "string",
+          "description": "IATA airport code",
+          "minLength": 2,
+          "maxLength": 10
+        },
+        "airport": {
+          "type": "string",
+          "description": "Airport display string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      },
+      "required": ["name", "code", "airport"]
+    },
+    "FlightSnapshot": {
+      "title": "FlightSnapshot",
+      "description": "Selected flight snapshot stored inside trips and wishlist items",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "airline": {
+          "type": "string",
+          "enum": ["IndiGo", "Air India", "Air India Express", "Akasa Air", "SpiceJet"],
+          "maxLength": 32
+        },
+        "airlineCode": {
+          "type": "string",
+          "enum": ["6E", "AI", "IX", "QP", "SG"],
+          "maxLength": 8
+        },
+        "flightNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "aircraft": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "departureTime": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 10
+        },
+        "arrivalTime": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 10
+        },
+        "duration": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20
+        },
+        "durationMinutes": {
+          "type": "number"
+        },
+        "departureSlot": {
+          "type": "string",
+          "enum": ["early", "morning", "afternoon", "night"],
+          "maxLength": 16
+        },
+        "originTerminal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "destTerminal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "basePrice": {
+          "type": "number"
+        },
+        "stops": {
+          "type": "number"
+        },
+        "stopsLabel": {
+          "type": "string",
+          "enum": ["Non Stop", "1 Stop", "2+ Stops"],
+          "maxLength": 16
+        },
+        "viaCity": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "refundable": {
+          "type": "boolean"
+        },
+        "mealIncluded": {
+          "type": "boolean"
+        },
+        "baggage": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "airline",
+        "airlineCode",
+        "flightNumber",
+        "aircraft",
+        "departureTime",
+        "arrivalTime",
+        "duration",
+        "durationMinutes",
+        "departureSlot",
+        "originTerminal",
+        "destTerminal",
+        "basePrice",
+        "stops",
+        "stopsLabel",
+        "viaCity",
+        "refundable",
+        "mealIncluded",
+        "baggage"
+      ]
+    },
+    "Trip": {
+      "title": "Trip",
+      "description": "Confirmed flight booking owned by a signed-in user",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Booking reference ID",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z0-9\\-]+$"
+        },
+        "bookingDate": {
+          "type": "string",
+          "description": "Formatted date when the booking was made",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "travelDate": {
+          "type": "string",
+          "description": "Formatted date of flight departure",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "departureDateIso": {
+          "type": "string",
+          "description": "ISO departure date YYYY-MM-DD",
+          "minLength": 10,
+          "maxLength": 20,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "departureDisplayDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "departureDay": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "fromCity": {
+          "$ref": "#/entities/CitySummary"
+        },
+        "toCity": {
+          "$ref": "#/entities/CitySummary"
+        },
+        "cabinClass": {
+          "type": "string",
+          "enum": ["Economy", "Premium Economy", "Business"],
+          "maxLength": 24
+        },
+        "flight": {
+          "$ref": "#/entities/FlightSnapshot"
+        },
+        "passengers": {
+          "type": "array",
+          "description": "List of 1 to 15 passengers for this booking"
+        },
+        "addOns": {
+          "type": "object",
+          "description": "Selected booking add-ons"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["upi", "card", "netbanking"],
+          "maxLength": 16
+        },
+        "pricing": {
+          "type": "object",
+          "description": "Itemized pricing breakdown"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total amount paid in INR"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when booking was recorded"
+        }
+      },
+      "required": [
+        "userId",
+        "bookingId",
+        "bookingDate",
+        "travelDate",
+        "departureDateIso",
+        "departureDisplayDate",
+        "departureDay",
+        "fromCity",
+        "toCity",
+        "cabinClass",
+        "flight",
+        "passengers",
+        "addOns",
+        "paymentMethod",
+        "pricing",
+        "totalAmount",
+        "createdAt"
+      ]
+    },
+    "WishlistItem": {
+      "title": "WishlistItem",
+      "description": "Saved flight and route in user's wishlist",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Deterministic wishlist document ID",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "flight": {
+          "$ref": "#/entities/FlightSnapshot"
+        },
+        "fromCity": {
+          "$ref": "#/entities/CitySummary"
+        },
+        "toCity": {
+          "$ref": "#/entities/CitySummary"
+        },
+        "travelDate": {
+          "type": "string",
+          "description": "Formatted date of travel",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "departureDateIso": {
+          "type": "string",
+          "description": "ISO departure date YYYY-MM-DD",
+          "minLength": 10,
+          "maxLength": 20,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "departureDisplayDate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "departureDay": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "cabinClass": {
+          "type": "string",
+          "enum": ["Economy", "Premium Economy", "Business"],
+          "maxLength": 24
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when flight was saved"
+        }
+      },
+      "required": [
+        "userId",
+        "itemId",
+        "flight",
+        "fromCity",
+        "toCity",
+        "travelDate",
+        "departureDateIso",
+        "departureDisplayDate",
+        "departureDay",
+        "cabinClass",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/trips/{tripId}": {
+      "schema": { "$ref": "#/entities/Trip" },
+      "description": "Confirmed flight bookings belonging strictly to the signed-in user"
+    },
+    "/users/{userId}/wishlist/{itemId}": {
+      "schema": { "$ref": "#/entities/WishlistItem" },
+      "description": "Saved flights in the signed-in user's wishlist"
+    }
+  }
+}

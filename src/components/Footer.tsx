@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { BrandLogo } from './Navbar';
+
 interface FooterProps {
   onOpenComingSoon: (feature: string) => void;
   onNavigateHome: () => void;
@@ -12,19 +14,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenComingSoon, onNavigateHome
         {/* Top row with TravelKart airplane logo, statement & app downloads */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8 pb-14 border-b border-slate-800">
           <div className="lg:col-span-2">
-            <div 
-              onClick={onNavigateHome} 
-              className="flex items-center gap-2.5 mb-4 cursor-pointer group"
-            >
-              {/* Airplane Logo Badge - Never shopping cart */}
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF7A00] to-[#FFB020] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-                <svg className="w-5 h-5 text-white -rotate-45" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path>
-                </svg>
-              </div>
-              <span className="text-2xl font-black tracking-tight text-white">
-                Travel<span className="text-[#FF8A00]">Kart</span>
-              </span>
+            <div className="mb-4">
+              <BrandLogo onClick={onNavigateHome} />
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm mb-6">
               TravelKart is India's fastest-growing online travel booking platform, bringing effortless flight reservations, budget &amp; luxury hotels, and custom holiday experiences to millions.

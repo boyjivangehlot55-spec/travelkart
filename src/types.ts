@@ -4,12 +4,14 @@ export interface City {
   name: string;
   code: string;
   airport: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface Flight {
   id: string;
-  airline: 'IndiGo' | 'Air India' | 'Vistara' | 'Akasa Air' | 'SpiceJet';
-  airlineCode: '6E' | 'AI' | 'UK' | 'QP' | 'SG';
+  airline: 'IndiGo' | 'Air India' | 'Air India Express' | 'Akasa Air' | 'SpiceJet';
+  airlineCode: '6E' | 'AI' | 'IX' | 'QP' | 'SG';
   flightNumber: string;
   aircraft: string;
   departureTime: string; // HH:mm format, e.g. "06:15"
@@ -23,6 +25,7 @@ export interface Flight {
   originalPrice?: number;
   stops: 0 | 1 | 2;
   stopsLabel: 'Non Stop' | '1 Stop' | '2+ Stops';
+  viaCity?: string;      // e.g. "Hyderabad (HYD)" for 1-stop flights
   refundable: boolean;
   mealIncluded: boolean;
   baggage: {
@@ -37,7 +40,7 @@ export interface SearchParams {
   tripType: 'oneway' | 'roundtrip';
   fromCity: City;
   toCity: City;
-  departureDate: string; // "31 Oct'26" or YYYY-MM-DD
+  departureDate: string; // YYYY-MM-DD
   departureDisplayDate: string;
   departureDay: string;
   returnDate?: string;
@@ -50,12 +53,16 @@ export interface SearchParams {
 }
 
 export interface PassengerDetails {
+  id: string;
+  type: 'Adult' | 'Child';
+  label: string; // e.g. "Adult 1", "Child 1"
   gender: 'Male' | 'Female' | 'Transgender';
   firstName: string;
   lastName: string;
-  email: string;
-  mobile: string;
-  saveTraveller: boolean;
+  age?: string; // 2 to 11 years for Child
+  email?: string; // Primary Contact only
+  mobile?: string; // Primary Contact only
+  saveTraveller?: boolean; // Primary Contact only
 }
 
 export interface AddOnsSelection {
@@ -69,7 +76,7 @@ export interface BookingRecord {
   bookingDate: string;
   flight: Flight;
   searchParams: SearchParams;
-  passenger: PassengerDetails;
+  passengers: PassengerDetails[];
   addOns: AddOnsSelection;
   paymentMethod: 'upi' | 'card' | 'netbanking';
   pricing: {
@@ -82,4 +89,44 @@ export interface BookingRecord {
     totalAmount: number;
     couponApplied: string | null;
   };
+}
+
+export interface CitySummary {
+  name: string;
+  code: string;
+  airport: string;
+}
+
+export interface TripRecord {
+  userId: string;
+  bookingId: string;
+  bookingDate: string;
+  travelDate: string;
+  departureDateIso: string;
+  departureDisplayDate: string;
+  departureDay: string;
+  fromCity: CitySummary;
+  toCity: CitySummary;
+  cabinClass: SearchParams['cabinClass'];
+  flight: Flight;
+  passengers: PassengerDetails[];
+  addOns: AddOnsSelection;
+  paymentMethod: 'upi' | 'card' | 'netbanking';
+  pricing: BookingRecord['pricing'];
+  totalAmount: number;
+  createdAtMillis: number;
+}
+
+export interface WishlistItem {
+  userId: string;
+  itemId: string;
+  flight: Flight;
+  fromCity: CitySummary;
+  toCity: CitySummary;
+  travelDate: string;
+  departureDateIso: string;
+  departureDisplayDate: string;
+  departureDay: string;
+  cabinClass: SearchParams['cabinClass'];
+  createdAtMillis: number;
 }
